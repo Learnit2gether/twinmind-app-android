@@ -1,5 +1,6 @@
 package io.twinmind.app.data
 
+import android.util.Log
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.NetworkType
@@ -7,11 +8,13 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import io.twinmind.app.TAG
 import io.twinmind.app.async.TranscriptionWorker
 import io.twinmind.app.core.database.ChunkEntity
 import io.twinmind.app.core.database.MeetingDao
 import io.twinmind.app.core.database.MeetingEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -92,7 +95,10 @@ class MeetingRepository @Inject constructor(
 
         // 3. AI Stream Processing
         var accumulatedSummary = ""
-        gemini.summarizeTranscriptStream(transcriptString).collect { partial ->
+        gemini.summarizeTranscriptStream(transcriptString).catch { e ->
+            emit("error processing stream ${e.message}")
+            Log.e(TAG, "error processing stream ${e.message}" )
+        }.collect { partial ->
             accumulatedSummary += partial
             emit(accumulatedSummary)
 
