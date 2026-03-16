@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.twinmind.app.core.database.MeetingDao
+import io.twinmind.app.core.toReadableDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +37,7 @@ class MemoriesViewModel @Inject constructor(
                         title = entity.title.ifBlank { "Untitled Meeting" },
                         displayTime = timeFormatter.format(Date(entity.startTime)),
                         // We calculate duration based on end of recording or chunks
-                        displayDuration = "0 min",
+                        displayDuration = entity.meetingDuration.toReadableDuration(),
                         dateHeader = headerFormatter.format(Date(entity.startTime))
                     )
                 }.groupBy { it.dateHeader }
