@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.twinmind.app.core.toMeetingDateTime
 import io.twinmind.app.ui.theme.TwinMindDarkBlue
 import kotlinx.coroutines.launch
 
@@ -52,7 +53,7 @@ fun DetailScreen(
                 title = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(meeting?.title ?: "Loading...", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("Mar 12 • 12:15 pm", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                        Text(meeting?.endTime?.toMeetingDateTime() ?: "NA", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
