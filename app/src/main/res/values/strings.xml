@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Gaurav TwinMind</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+</resources>
