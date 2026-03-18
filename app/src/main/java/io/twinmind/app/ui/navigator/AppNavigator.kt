@@ -1,5 +1,8 @@
 package io.twinmind.app.ui.navigator
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,10 +24,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -32,6 +39,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import io.twinmind.app.core.openAppSettings
 import io.twinmind.app.ui.details.DetailScreen
 import io.twinmind.app.ui.details.DetailViewModel
 import io.twinmind.app.ui.memories.MemoriesScreen
@@ -48,6 +56,23 @@ data class Detail(val meetingId: String): NavKey
 fun AppNavigatorScreen(viewModel: NavigatorViewModel) {
     val uiModel by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     val backstack: SnapshotStateList<NavKey> = remember { mutableStateListOf(Memories) }
+    var showRationale by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if (showRationale) {
+        RationaleDialog(
+            title = "Enable Permission",
+            description = "Please enable required permissions from app settings to record audio.",
+            confirmText = "Open Settings",
+            onDismiss = {
+                showRationale = false
+            },
+            onContinue = {
+                showRationale = false
+                openAppSettings(context)
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -70,7 +95,13 @@ fun AppNavigatorScreen(viewModel: NavigatorViewModel) {
                     )
                 } else {
                     ExtendedFloatingActionButton(
-                        onClick = { viewModel.startRecording() },
+                        onClick = {
+                            if (checkRequiredPermission(context)) {
+                                viewModel.startRecording()
+                            }else {
+                                showRationale = true
+                            }
+                        },
                         icon = {
                             Icon(Icons.Default.PlayArrow, contentDescription = "Record")
                         }, text = {
@@ -122,6 +153,26 @@ fun AppNavigationContent(backstack: SnapshotStateList<NavKey> ) {
                 }
             })
     }
+}
+
+private fun checkRequiredPermission(
+    context: Context
+): Boolean {
+
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        return false
+    }
+
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        return false
+    }
+
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        return false
+    }
+
+    return true
+
 }
 
 

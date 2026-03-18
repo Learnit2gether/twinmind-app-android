@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.twinmind.app.core.toMeetingDateTime
 import io.twinmind.app.ui.theme.TwinMindDarkBlue
 import kotlinx.coroutines.launch
 
@@ -42,17 +43,13 @@ fun DetailScreen(
     val pagerState = rememberPagerState(initialPage = 1) { viewModel.tabs.size }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(meetingId) {
-        viewModel.ensureSummaryGenerated(meetingId)
-    }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(meeting?.title ?: "Loading...", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("Mar 12 • 12:15 pm", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                        Text(meeting?.endTime?.toMeetingDateTime() ?: "NA", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
@@ -86,7 +83,7 @@ fun DetailScreen(
                 modifier = Modifier.fillMaxSize()
             ) { pageIndex ->
                 when (pageIndex) {
-                    0-> NotesTab(meeting?.summary ?: "Generating summary...")
+                    0-> NotesTab(meetingId, viewModel)
                     1 -> TranscriptTab(meeting?.startTime ?: 0L, chunks)
                 }
             }

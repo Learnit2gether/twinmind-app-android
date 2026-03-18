@@ -10,7 +10,7 @@ import javax.inject.Inject
 class MeetingRecordingUseCase @Inject constructor(
    @ApplicationContext private val applicationContext: Context
 ){
-    fun startMeeting(meetingId: String) {
+    fun startMeeting() {
         val intent = Intent(applicationContext, MeetingRecordingService::class.java).apply {
             action = MeetingRecordingService.ACTION_START
         }

@@ -12,7 +12,6 @@ import java.io.File
 import javax.inject.Inject
 
 class GeminiRepository @Inject constructor(
-    @ApplicationContext private val appContext: Context,
     private val generativeModel: GenerativeModel
 ) {
 
@@ -34,9 +33,9 @@ class GeminiRepository @Inject constructor(
     }
 
     // 2. Generate Structured Summary with Streaming
-    suspend fun summarizeTranscriptStream(transcript: String): Flow<String> = flow {
+    fun summarizeTranscriptStream(transcript: String): Flow<String> = flow {
         val prompt = """
-            convert meeting transcripts into structured Markdown notes.
+            convert given meeting transcripts into structured Markdown notes.
 
             Rules:
             - Output only Markdown

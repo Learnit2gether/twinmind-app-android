@@ -20,11 +20,9 @@ class NavigatorViewModel @Inject constructor(
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
     // todo - check runtime permission foreground, microphone, read phone state
-    fun startRecording(): String {
-        val meetingId = generateMeetingId()
-        meetingRecordingUseCase.startMeeting(meetingId)
+    fun startRecording() {
+        meetingRecordingUseCase.startMeeting()
         _uiStateFlow.update { UiModel(true) }
-        return meetingId
     }
 
     fun stopRecording() {
