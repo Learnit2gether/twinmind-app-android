@@ -43,10 +43,6 @@ fun DetailScreen(
     val pagerState = rememberPagerState(initialPage = 1) { viewModel.tabs.size }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(meetingId) {
-        viewModel.ensureSummaryGenerated(meetingId)
-    }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -87,7 +83,7 @@ fun DetailScreen(
                 modifier = Modifier.fillMaxSize()
             ) { pageIndex ->
                 when (pageIndex) {
-                    0-> NotesTab(meeting?.summary ?: "Generating summary...")
+                    0-> NotesTab(meetingId, viewModel)
                     1 -> TranscriptTab(meeting?.startTime ?: 0L, chunks)
                 }
             }
